@@ -19,25 +19,30 @@ function new_sprite(tx_name)
 	return s;
 }
 
+// some useful variables
+var FPS = 45;
+
 var _tex = {};
-var apples = [];
+var apples = []; // holds references to the apples
 var num_apples = 0;
 
+// the score of the current game
 var score = 0;
 
 var speed = 10;
 var left_down = false;
 var right_down = false;
 
-var gravity = 0.03;
+var gravity = 1;
 
 var max_time = 30;
-var timer = 0;
+var timer = 0; // the time left in the game
 
-var restart_timer = 0;
+var restart_timer = 0; // the timer after a game ends that prevents the game from starting again too soon
 
-var plays = 0;
+var plays = 0; // how many times the game has been played
 
+// preload the textures
 load_texture_path("apple_green_good.png", "green");
 load_texture_path("apple_pink_good.png", "pink");
 load_texture_path("apple_red_good.png", "red");
@@ -49,6 +54,7 @@ function new_apple()
 	var r = Math.random() * 3;
 	var apple = {falling : true, r : Math.random() * 0.125 - 0.0625, dy : 0};
 	
+	// choose a random color for the apple
 	if(r > 2)
 		apple.g = new_sprite("green");
 	else if(r > 1)
@@ -73,10 +79,13 @@ function animate()
 	requestAnimationFrame(animate);
 	renderer.render(stage);
 }
+
+// the game logic
 function game_tick()
 {
 	if(timer > 0)
-		setTimeout(game_tick, 1000/45); // 45 fps
+		// set the loop to run again
+		setTimeout(game_tick, 1000/FPS); // 45 fps
 	else
 		game_end();
 	
@@ -95,7 +104,7 @@ function game_tick()
 		else if(a.falling == true)
 		{
 			a.g.rotation += a.r;
-			a.dy += gravity; // simulate gravity
+			a.dy += gravity / FPS; // simulate gravity
 			
 			if(a.g.y < 400)
 			{
