@@ -52,7 +52,11 @@ load_texture_path("bucket.png", "bucket");
 function new_apple()
 {
 	var r = Math.random() * 3;
-	var apple = {falling : true, r : Math.random() * 0.125 - 0.0625, dy : 0};
+	var apple = {
+		falling : true, 
+		r : Math.random() * 0.125 - 0.0625, 
+		dy : 0
+	};
 	
 	// choose a random color for the apple
 	if(r > 2)
@@ -233,7 +237,7 @@ start_text.y = 100;
 restart_text.x = 100;
 restart_text.y = 100;
 
-END.x = 100;
-END.y = 100;
+END.x = 150;
+END.y = 150;
 
 animate();
