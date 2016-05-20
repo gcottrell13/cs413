@@ -19,6 +19,10 @@ function animate()
 }
 
 // the game logic
+
+var start_button_fallen = false;
+var start_button_fixed = false;
+
 function game_tick()
 {
 }
@@ -43,7 +47,8 @@ window.onkeyup = function(e)
 
 function start()
 {
-	game_tick();
+	//game_tick();
+	state_stack.push('game');
 }
 
 function game_end()
