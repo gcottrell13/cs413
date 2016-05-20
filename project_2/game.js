@@ -1,5 +1,5 @@
 var gameport = document.getElementById("gameport");
-var renderer = PIXI.autoDetectRenderer(400, 400, {backgroundColor : 0xeeeeee});
+var renderer = PIXI.autoDetectRenderer(400, 400, {backgroundColor : 0x333333});
 gameport.appendChild(renderer.view);
 
 var state_stack = new stackhelper();
@@ -21,7 +21,6 @@ function animate()
 // the game logic
 function game_tick()
 {
-	
 }
 
 // game mechanics

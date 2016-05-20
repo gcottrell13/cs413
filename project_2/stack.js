@@ -23,6 +23,10 @@ function stackhelper()
 		return null;
 	};
 	
+	this.is_empty = function()
+	{
+		return top <= 0;
+	};
 }
 
 
