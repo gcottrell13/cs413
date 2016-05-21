@@ -3,8 +3,8 @@ function layouts()
 
 	elements = {
 		
-		END : new newText("Time's Up!", {font : '34px Arial', fill : 'black', align : 'center', wordWrap : true, wordWrapWidth : 200})
-			.pos(100, 100),
+		levelselect : new newText("Level Selection", {font : '34px Arial', fill : 'white'})
+			.pos(20, 10),
 		button : new newButton('red', 'pink', 'green')
 			.click(function(md){
 				})
@@ -13,10 +13,24 @@ function layouts()
 		sg_backprint : new newSprite('sg_backprint')
 			.pos(100, 95),
 		
+		menu_gear : new newSprite('gear')
+			.anchor(0.5, 0.5)
+			.pos(50, 50),
+		menu_gear2 : new newSprite('gear')
+			.anchor(0.5, 0.5)
+			.scale(0.5, 0.5)
+			.pos(50+42+21, 50),
+		
 		start_game_button : new newButton('sg_up', 'sg_hd', 'sg_hd')
 			.click(function(md)
 				{
 					// the logic for the falling menu button
+					if(getCookie('fallen') != '')
+					{
+						start_button_fallen = true;
+						start_button_fixed = true;
+					}
+					
 					if(start_button_fallen == false && start_button_fixed == false)
 					{
 						createjs.Tween.get(elements.start_game_button.g.position).to({x: 100, y: 350}, 1000, createjs.Ease.bounceOut);
@@ -42,6 +56,7 @@ function layouts()
 										setTimeout(function()
 										{
 											button_func(elements.start_game_button);
+											setCookie('fallen', 'DONE', 100);
 											start_button_fixed = true;
 										}, 500);
 									}
@@ -61,6 +76,7 @@ function layouts()
 					}
 				})
 			.anchor(0.5, 0.5)
+			.sound(true)
 			.pos(100, 95),
 		
 		credits_button : new newButton('credits_up', 'credits_hd', 'credits_hd')
@@ -68,6 +84,7 @@ function layouts()
 				{
 					state_stack.push('credits');
 				})
+			.sound(true)
 			.pos(100, 200),
 		
 		credits_text : new newText("Art and sound by Gage Cottrell (c) 2016",
@@ -80,6 +97,16 @@ function layouts()
 					if(state_stack.is_empty() == false)
 						state_stack.pop();
 				})
+			.sound(true)
+			.pos(5, 295),
+			
+		back_button_levels : new newButton('back_up', 'back_hd', 'back_hd')
+			.click(function(md)
+				{
+					if(state_stack.is_empty() == false)
+						state_stack.pop();
+				})
+			.sound(true)
 			.pos(5, 295),
 			
 		back_button_game : new newButton('back_up', 'back_hd', 'back_hd')
@@ -88,12 +115,19 @@ function layouts()
 					if(state_stack.is_empty() == false)
 						state_stack.pop();
 				})
-			.pos(5, 295)
+			.pos(155, 5)
+			.scale(0.75, 0.75),
+		
+		bg_image: new newSprite('bg')
+			.scale(2, 2)
+		
 	};
 
 	states = {
 		top : construct_graph(new PIXI.Container(0x0, true))
 			.down()
+			.create('menu_gear')
+			.create('menu_gear2')
 			.create('sg_backprint')
 			.create('start_game_button')
 			.create('credits_button')
@@ -105,8 +139,15 @@ function layouts()
 			.create('back_button_credits')
 		.end(),
 		
+		level_choose : construct_graph(new PIXI.Container(0, true))
+			.down()
+			.create('levelselect')
+			.create('back_button_levels')
+		.end(),
+		
 		game : construct_graph(new PIXI.Container(0, true))
 			.down()
+			.create('bg_image')
 			.create('back_button_game')
 		.end()
 	};

@@ -4,13 +4,19 @@
 	</head>
 	<body>
 	
-		<h1>Puzzle 2</h1>
+		<h1>This Game Really Grinds My Gears</h1>
 		<div id="gameport"></div>
 		<p id="timer_display"></p>
 		<p id="score_display"></p>
 		
 		<h1>Instructions</h1>
 		<p>How to play:</p>
+		<p>Get the orange gears to spin up to 100%! <br>
+			They each have different requirements for how far they have to spin.</p>
+		<p>Use the grey and yellow gears to do that,<br>
+			but you can only modify their arrangement when the mechanism isn't running.</p>
+		<p>Put gears on top of each other to make them rotate with the same speed.</p>
+		<p>There are bugs when gears of multiple speeds are trying to move each other. They should be locking up, but it doesn't happen.</p>
 		
 		<h1>Disqus</h1>
 		<div id="disqus_thread"></div>
@@ -20,17 +26,35 @@
 			s.src = 'http://nau-cs413.disqus.com/embed.js';
 			s.setAttribute('data-timestamp', +new Date());
 			(d.head || d.body).appendChild(s);
-			});//(); 
+			})(); 
 		</script>
 	
 		<script src="../pixi.js"></script>
+		<script src="../pixi-audio.js"></script>
 		<script src="../tweenjs.min.js"></script>
-		<script src="../soundjs.min.js"></script>
 		<script src="preload.js"></script>
 		<script src="stack.js"></script>
 		<script src="menus.js"></script>
 		<script src="layouts.js"></script>
+		<script src="levels.js"></script>
 		<script src="game.js"></script>
-	
+		<script>
+		function getCookie(cname) {
+			var name = cname + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0; i<ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1);
+				if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+			}
+			return "";
+		}
+		function setCookie(cname, cvalue, exdays) {
+			var d = new Date();
+			d.setTime(d.getTime() + (exdays*24*60*60*1000));
+			var expires = "expires="+d.toUTCString();
+			document.cookie = cname + "=" + cvalue + "; " + expires + 'path=/';
+		}
+		</script>
 	</body>
 </html>

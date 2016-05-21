@@ -22,6 +22,7 @@ function newButton(up, hover, down)
 		return this;
 	};
 	var me = this;
+	var sound = false;
 	this.click = function(cb)
 	{
 		this.g.click = function(md)
@@ -29,14 +30,29 @@ function newButton(up, hover, down)
 			me.gdown.visible = false;
 			me.gup.visible = true;
 			me.ghover.visible = false;
+			if(sound)
+				PIXI.audioManager.getAudio("blip.mp3").play();
 			cb(md);
 		};
 		return this;
 	};
+	
+	this.sound = function(b)
+	{
+		sound = b;
+		return this;
+	};
+	
 	this.anchor = function(x, y)
 	{
 		this.g.anchor.x = x;
 		this.g.anchor.y = y;
+		return this;
+	};
+	this.scale = function(xs, ys)
+	{
+		this.g.scale.x = xs;
+		this.g.scale.y = ys;
 		return this;
 	};
 	
@@ -56,6 +72,17 @@ function newSprite(tx_name)
 	{
 		this.g.anchor.x = x;
 		this.g.anchor.y = y;
+		return this;
+	};
+	this.on = function(em, cb)
+	{
+		this.g.on(em, cb);
+		return this;
+	};
+	this.scale = function(xs, ys)
+	{
+		this.g.scale.x = xs;
+		this.g.scale.y = ys;
 		return this;
 	};
 }

@@ -18,7 +18,22 @@ function new_sprite(tx_name)
 	return s;
 }
 
+
+load_texture_path("dat/startgame_backprint.png", "sg_backprint");
+load_texture_path("dat/gear_base.png", "gear");
+load_texture_path("dat/gear_goal.png", "gear_goal");
+load_texture_path("dat/gear_start.png", "gear_start");
+
+load_texture_path("dat/go.png", "go");
+load_texture_path("dat/stop.png", "stop");
+load_texture_path("dat/reset.png", "reset");
+
+load_texture_path("dat/progress_back.png", "progress_back");
+
+load_texture_path("dat/bg.png", "bg");
+
 PIXI.loader
+  .add("blip.mp3")
   .add("data.json")
   .load(function ()
 {
@@ -35,7 +50,6 @@ PIXI.loader
 	load_texture_frame("credits_up.png", "credits_up");
 	load_texture_frame("credits_hover.png", "credits_hd");
 	
-	load_texture_path("dat/startgame_backprint.png", "sg_backprint");
 	
 	layouts();
 	
