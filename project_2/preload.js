@@ -1,6 +1,8 @@
 
 PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
 
+var bg_music;
+
 var _tex = {};
 function load_texture_path(path, name)
 {
@@ -34,6 +36,8 @@ load_texture_path("dat/bg.png", "bg");
 
 PIXI.loader
   .add("blip.mp3")
+  .add("connect.mp3")
+  .add("mechanisms.mp3")
   .add("data.json")
   .load(function ()
 {
@@ -50,6 +54,11 @@ PIXI.loader
 	load_texture_frame("credits_up.png", "credits_up");
 	load_texture_frame("credits_hover.png", "credits_hd");
 	
+	
+	bg_music = PIXI.audioManager.getAudio("mechanisms.mp3");
+	bg_music.loop = true;
+	bg_music.volume = 0.40;
+	bg_music.play();
 	
 	layouts();
 	

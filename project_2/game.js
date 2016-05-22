@@ -12,6 +12,13 @@ for(var i = 65; i <= 90; i++)
 // some useful variables
 var FPS = 45;
 
+var bg_playing = true;
+
+var circles = [];
+
+var gear_teeth_contact = 30;
+var gear_center_contact = 20;
+
 function animate()
 {
 	requestAnimationFrame(animate);
@@ -23,15 +30,47 @@ function animate()
 		elements.menu_gear.g.rotation += 0.03;
 		elements.menu_gear2.g.rotation += -0.06;
 	}
+	
+	for(var i = 0; i < circles.length; i++)
+	{
+		if(context != undefined)
+		{
+			context.beginPath();
+			context.arc(circles[i][0], circles[i][1], circles[i][2], 0, 2 * Math.PI, false);
+			context.fillStyle = circles[i][3];
+			context.fill();
+			context.lineWidth = 0;
+			context.strokeStyle = circles[i][3];
+			context.stroke();
+			context.endPath();
+			
+		}
+	}
+	circles = [];
+	
 }
 
 window.onkeydown = function(e)
 {
 	var keyCode = e.keyCode;
+	
+	if(keyCode == keyCodes.m)
+	{
+		if(bg_playing)
+			bg_music.stop();
+		if(!bg_playing)
+			bg_music.play();
+		bg_playing = !bg_playing;
+	}
 };
 window.onkeyup = function(e)
 {
 	var keyCode = e.keyCode;
+}
+
+function draw_circle(x, y, r, color)
+{
+	circles.push([x, y, r, color]);
 }
 
 // the game logic
@@ -169,7 +208,7 @@ function power_gear(root, g, sv)
 			var rad2 = Math.pow(42*g.size + 42*g2.size, 2);
 			
 			// if their distance is within 30 pixels of their added radii
-			if(Math.abs(dist2 - rad2) <= 900)
+			if(Math.abs(dist2 - rad2) <= gear_teeth_contact*gear_teeth_contact)
 			{
 				n_neighbors ++;
 				if(g2.powered == false)
@@ -179,7 +218,7 @@ function power_gear(root, g, sv)
 					if(g2.angular_velocity != -g.angular_velocity * (g.size / g2.size)) g2.locked = g.locked = true;
 				}
 			}
-			else if(dist2 < 400) // if their centers are within 20 pixels, then bind their angular velocities
+			else if(dist2 < gear_center_contact*gear_center_contact) // if their centers are within 20 pixels, then bind their angular velocities
 			{
 				n_neighbors ++;
 				if(g.powered == false && g2.powered == false)
@@ -482,6 +521,40 @@ function construct_level(levelid)
 									var y = md.data.originalEvent.pageY - dy;
 									gg.x = x;
 									gg.y = y;
+									
+									gg.tint = 0xffffff;
+	// check to see if it is nearby other gears
+	for(var j = 0; j < root.all_gears.length; j++)
+	{
+		var g2 = root.all_gears[j];
+		if(g2 != gg) // we don't want to power ourselves
+		{
+			var dist2 = (Math.pow(g2.x - gg.x, 2) + Math.pow(g2.y - gg.y, 2));
+			var rad2 = Math.pow(42*gg.size + 42*g2.size, 2);
+			
+			// if their distance is within N pixels of their added radii
+			if(Math.abs(dist2 - rad2) <= gear_teeth_contact*gear_teeth_contact)
+			{
+				//draw_circle((gg.x+g2.x)/2, (gg.y+g2.y)/2, 10, 'red');
+				if(gg.connected_to[g2._name] == undefined || gg.connected_to[g2._name] == false)
+				{
+					gg.connected_to[g2._name] = g2;
+					PIXI.audioManager.getAudio("connect.mp3").play();
+				}
+				
+			}
+			else if(dist2 < gear_center_contact*gear_center_contact) // if their centers are within N pixels, then bind their angular velocities
+			{
+				gg.tint = 0xff99ff;
+				if(g2.powered == false && g2.gear_type != 'goal')
+					g2.tint = 0xff99ff;
+			}
+			else if(gg.connected_to[g2._name] != undefined && gg.connected_to[g2._name] != false)
+			{
+				gg.connected_to[g2._name] = false;
+			}
+		}
+	}
 								};
 								gg.mouseup = function(md)
 								{
@@ -501,6 +574,9 @@ function construct_level(levelid)
 		g.locked = false;
 		
 		g.powered_by = null;
+		
+		g.connected_to = {};
+		g._name = "gear" + i;
 	}
 	
 	// some text explaining what to do
