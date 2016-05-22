@@ -72,7 +72,7 @@ function layouts()
 					}
 					else if(start_button_fixed == true)
 					{
-						start();
+						state_stack.push('instructions');
 					}
 				})
 			.anchor(0.5, 0.5)
@@ -109,6 +109,23 @@ function layouts()
 			.sound(true)
 			.pos(5, 295),
 			
+		back_button_tut : new newButton('back_up', 'back_hd', 'back_hd')
+			.click(function(md)
+				{
+					if(state_stack.is_empty() == false)
+						state_stack.pop();
+				})
+			.sound(true)
+			.pos(5, 295),
+			
+		start_game_tut_button : new newButton('sg_up', 'sg_hd', 'sg_hd')
+			.sound(true)
+			.click(function(md)
+				{
+					start();
+				})
+			.pos(200, 300),
+			
 		back_button_game : new newButton('back_up', 'back_hd', 'back_hd')
 			.click(function(md)
 				{
@@ -119,8 +136,18 @@ function layouts()
 			.scale(0.75, 0.75),
 		
 		bg_image: new newSprite('bg')
-			.scale(2, 2)
+			.scale(2, 2),
 		
+		instructions : new newText(
+			"How to play:\n" +
+			"- Get the orange gears to spin up to 100%! \n" +
+			"- They each have different requirements for how far\nthey have to spin.\n" +
+			"- Use the grey gears to do that, " +
+			"but you can only\nmodify their arrangement when the\nmechanism isn't running.\n" +
+			"- Put gears on top of each other to make them rotate\nwith the same speed.",
+			{font : '16px Arial', fill : 'white'})
+			.pos(5, 5)
+			
 	};
 
 	states = {
@@ -143,6 +170,13 @@ function layouts()
 			.down()
 			.create('levelselect')
 			.create('back_button_levels')
+		.end(),
+		
+		instructions : construct_graph(new PIXI.Container(0, true))
+			.down()
+			.create('back_button_tut')
+			.create('instructions')
+			.create('start_game_tut_button')
 		.end(),
 		
 		game : construct_graph(new PIXI.Container(0, true))

@@ -14,7 +14,10 @@ var FPS = 45;
 
 var bg_playing = true;
 
+// unused for now
 var circles = [];
+
+var sound_connect;
 
 var gear_teeth_contact = 30;
 var gear_center_contact = 20;
@@ -31,22 +34,6 @@ function animate()
 		elements.menu_gear2.g.rotation += -0.06;
 	}
 	
-	for(var i = 0; i < circles.length; i++)
-	{
-		if(context != undefined)
-		{
-			context.beginPath();
-			context.arc(circles[i][0], circles[i][1], circles[i][2], 0, 2 * Math.PI, false);
-			context.fillStyle = circles[i][3];
-			context.fill();
-			context.lineWidth = 0;
-			context.strokeStyle = circles[i][3];
-			context.stroke();
-			context.endPath();
-			
-		}
-	}
-	circles = [];
 	
 }
 
@@ -241,6 +228,8 @@ function power_gear(root, g, sv)
 function start()
 {
 	game_tick();
+	
+	sound_connect = PIXI.audioManager.getAudio("connect.mp3");
 	
 	state_stack.push('level_choose');
 	
@@ -539,7 +528,7 @@ function construct_level(levelid)
 				if(gg.connected_to[g2._name] == undefined || gg.connected_to[g2._name] == false)
 				{
 					gg.connected_to[g2._name] = g2;
-					PIXI.audioManager.getAudio("connect.mp3").play();
+					sound_connect.play();
 				}
 				
 			}
