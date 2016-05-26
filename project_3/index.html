@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<title>Tiles</title>
+	</head>
+	<body>
+	
+		<h1></h1>
+		<div id="gameport"></div>
+		
+		<h1>Instructions</h1>
+		
+		<h1>Disqus</h1>
+		<div id="disqus_thread"></div>
+		<script>
+			(function() {
+			var d = document, s = d.createElement('script');
+			s.src = 'http://nau-cs413.disqus.com/embed.js';
+			s.setAttribute('data-timestamp', +new Date());
+			(d.head || d.body).appendChild(s);
+			});//(); 
+		</script>
+	
+		<script src="../pixi.js"></script>
+		<script src="../pixi-audio.js"></script>
+		<script src="../tweenjs.min.js"></script>
+		<script src="../tileUtilities.js"></script>
+		<script src="preload.js"></script>
+		<script src="stack.js"></script>
+		<script src="menus.js"></script>
+		<script src="layouts.js"></script>
+		<script src="levels.js"></script>
+		<script src="game.js"></script>
+		<script>
+		function getCookie(cname) {
+			var name = cname + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0; i<ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1);
+				if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+			}
+			return "";
+		}
+		function setCookie(cname, cvalue, exdays) {
+			var d = new Date();
+			d.setTime(d.getTime() + (exdays*24*60*60*1000));
+			var expires = "expires="+d.toUTCString();
+			document.cookie = cname + "=" + cvalue + "; " + expires + 'path=/';
+		}
+		</script>
+	</body>
+</html>
