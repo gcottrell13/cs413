@@ -86,6 +86,7 @@ function animate()
 
 var trigger1 = false;
 var trigger2 = false;
+var win = false;
 
 function game_tick()
 {
@@ -98,19 +99,19 @@ function game_tick()
 		var step = 1;
 		
 		if(player.direction == 'up')
-			player.y = y0 - step - 1;
+			player.y = y0 - step*5/4;
 		if(hittest_block(player)) player.y = y0;
 		
 		if(player.direction == 'down')
-			player.y = y0 + step + 1;
+			player.y = y0 + step*5/4;
 		if(hittest_block(player)) player.y = y0;
 		
 		if(player.direction == 'left')
-			player.x = x0 - step - 1;
+			player.x = x0 - step*5/4;
 		if(hittest_block(player)) player.x = x0;
 		
 		if(player.direction == 'right')
-			player.x = x0 + step + 1;
+			player.x = x0 + step*5/4;
 		if(hittest_block(player)) player.x = x0;
 		
 		if(x0 != player.x || y0 != player.y)
@@ -125,13 +126,14 @@ function game_tick()
 		{
 			// play sound
 			trigger1 = true;
+			PIXI.audioManager.getAudio('ding.mp3').play();
 		}
 	}
 	if(player.x > 350 && player.x < 380 && player.y > 480)
 	{
 		player.y = 340;
 	}
-	if(player.x > 416 && player.x < 440 && player.y < 330)
+	if(player.x > 410 && player.x < 450 && player.y < 330)
 	{
 		player.y = 474;
 		if(trigger1 && trigger2)
@@ -140,19 +142,29 @@ function game_tick()
 			player.y = 356;
 		}
 	}
-	if(player.x > 416 && player.x < 440 && player.y > 480)
+	if(player.x > 410 && player.x < 450 && player.y > 480)
 	{
 		player.y = 340;
 		if(trigger2 == false)
 		{
 			// play sound
 			trigger2 = true;
+			PIXI.audioManager.getAudio('ding.mp3').play();
 		}
 	}
 	
 	if(player.y < 162)
 	{
 		// winner!
+		if(win == false)
+		{
+			win = true;
+			PIXI.audioManager.getAudio('finish.mp3').play();
+			setTimeout(function()
+				{
+					state_stack.push('done');
+				}, 1000);
+		}
 	}
 	
 	get_camera_pos(player, camera);
@@ -176,6 +188,13 @@ function hittest_block(who)
 // the entry point to the game
 function start()
 {
+	if(world != undefined)
+	{
+		states.top.removeChild(world);
+		trigger1 = false;
+		trigger2 = false;
+		win = false;
+	}
 	
 	world = tu.makeTiledWorld("map_json", "tileset.png");
 	states.top.addChild(world);
