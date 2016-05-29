@@ -1,5 +1,5 @@
 
-var game_scale = 1;
+var game_scale = 2;
 var game_width = 800;
 var game_height = 600;
 
@@ -16,8 +16,8 @@ var pi2 = pi/2;
 var tu = new TileUtilities(PIXI);
 var su = new SpriteUtilities(PIXI);
 var world;
-var player;
-var camera = {x: 0, y: 0};
+var player = null;
+var viewport = new PIXI.Container();
 var mapArray;
 
 // some useful variables
@@ -26,6 +26,11 @@ var FPS = 45;
 var gravity = 1/FPS;
 
 var bg_playing = true;
+
+var current_level = 0;
+
+// if we currently have a game playing
+var level_playing = false;
 
 window.onkeydown = function(e)
 {
@@ -62,73 +67,121 @@ function animate()
 // the game logic
 
 var win = false;
+var MAX_SPEED = 5;
 
 function game_tick()
 {
+	if(player == null) return;
+	if(level_playing == false) return;
 	
-	//get_camera_pos(player, camera);
-	states.game.x = camera.x;
-	states.game.y = camera.y;
+	if(win)
+	{
+		player.speed = MAX_SPEED / 2;
+		player.angle = pi2;
+	}
+	else
+		player.apply_gravity();
 	
-	player.apply_gravity();
 	player.move();
 	
-	//if(get_block_gid_at(player) != 0)
+	get_camera_pos(player, viewport);
+	
+	if(player.y < 0 || 
+		player.x > world.worldWidth || 
+		player.x < 0 || 
+		player.y > world.worldHeight ||
+		hittest_block(player, levels[current_level].solid_blocks) == true)
+		{
+			// crash
+			level_playing = false;
+			
+			setTimeout(function(){restart_level();}, 1000);
+		}
+	
+	if(hittest_block(player, levels[current_level].end_blocks) == true)
 	{
-		// loser
+		// show 'you win' overlay
+		// autopilot plane at horizontal moderate speed
+		// load next level
+		win = true;
+		
+		if(current_level < num_levels)
+		{
+			load_level(current_level + 1);
+			start_level();
+		}
 	}
 	
-	if(player.x < 0) player.x = game_width;
-	if(player.y < 0) player.y = game_height;
-	if(player.x > game_width) player.x = 0;
-	if(player.y > game_height) player.y = 0;
+	//elements.gamebg.g.x = player.x - game_width / game_scale;
+	//elements.gamebg.g.y = player.y - game_height / game_scale;
 	
-	elements.gamebg.g.x = player.x - game_width / game_scale;
-	elements.gamebg.g.y = player.y - game_height / game_scale;
-	
-	if(win == false)
-		setTimeout(game_tick, 1000 / FPS);
+	setTimeout(game_tick, 1000 / FPS);
 }
 
 // game mechanics
 
 function hittest_block(who, blocks)
 {
+	var index = tu.getIndex(who.x, who.y, world.tilewidth, world.tileheight, world.widthInTiles);
+	var tile = tu.getTile(index, mapArray, world).gid;
+	
 	for(var i = 0; i < blocks.length; i++)
-		if(tu.hitTestTile(who, mapArray, blocks[i], world, 'every').hit)
+		if(tile == blocks[i])
 			return true;
 	return false;
 }
 function get_block_gid_at(who)
 {
-	return tu.hitTestTile(who, mapArray, 0, world, 'every').gid;
+	return tu.hitTestTile(who, mapArray, 0, world, 'some').gid;
 }
 
 // the entry point to the game
 function start()
 {
+	states.game.addChild(viewport);
+	
+	viewport.scale.x = game_scale;
+	viewport.scale.y = game_scale;
+	
+	load_level(1);
+	start_level();
+}
+
+function start_level()
+{
+	if(level_playing == false) 
+	{
+		level_playing = true;
+		game_tick();
+	}
+}
+function restart_level()
+{
+	load_level(current_level);
+	start_level();
+}
+
+function load_level(n)
+{
 	// reset the world
 	if(world != undefined)
 	{
-		states.game.removeChild(world);
+		viewport.removeChild(world);
+		viewport.removeChild(player);
 		win = false;
 	}
 	
-	//world = tu.makeTiledWorld("map_json", "tileset.png");
-	//states.game.addChild(world);
+	world = tu.makeTiledWorld(levels[n].map, levels[n].tileset);
+	viewport.addChild(world);
 	
-	states.game.scale.x = game_scale;
-	states.game.scale.y = game_scale;
-	
-	elements.gamebg.g.scale.x = 0.5;
-	elements.gamebg.g.scale.y = 0.5;
+	mapArray = world.getObject('map').data;
 	
 	construct_player();
 	
-	player.x = game_width / 2;
-	player.y = game_height / 2;
+	player.speed = 2;
+	player.angle = pi2;
 	
-	game_tick();
+	current_level = n;
 }
 
 function get_camera_pos(focus, camera) {
@@ -144,7 +197,9 @@ function get_camera_pos(focus, camera) {
 
 function construct_player()
 {
-	var playerscale = 2;
+	var playerscale = 1;
+	
+	var spawn = world.getObject('spawn');
 	
 	var tx = new PIXI.BaseTexture.fromImage('dat/airplane.png');
 	var frames = [
@@ -154,7 +209,7 @@ function construct_player()
 	];
 	
 	player = new PIXI.Container();
-	states.game.addChild(player);
+	viewport.addChild(player);
 	
 	var g = new PIXI.extras.MovieClip(frames);
 	player.addChild(g);
@@ -165,6 +220,9 @@ function construct_player()
 	
 	g.anchor.x = 0.5;
 	g.anchor.y = 0.5;
+	
+	player.x = spawn.x;
+	player.y = spawn.y;
 	
 	player.g.play();
 	player.g.animationSpeed = 0.1;
@@ -177,14 +235,13 @@ function construct_player()
 	player.angle = 0; // angle from vertical
 	
 	var flags = {
-		flipped: false,
-		boost: false
+		flipped: false
 	};
+	
 	player.state = 'normal';
 	
 	player.apply_gravity = function()
 	{
-		var MAX_SPEED = 5;
 		var MAX_BOOST = MAX_SPEED * 2;
 		
 		if(player.angle > 0)
@@ -266,6 +323,15 @@ function construct_player()
 	{
 		player.facing = -player.facing;
 		player.g.scale.y = player.facing * playerscale;
+	};
+	
+	player.apply_boost = function()
+	{
+		player.state = 'boost';
+		setTimeout(function()
+			{
+				player.state = 'normal';
+			}, 5 * 1000);
 	};
 	
 }

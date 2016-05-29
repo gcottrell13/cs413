@@ -21,7 +21,9 @@ function new_sprite(tx_name)
 }
 
 PIXI.loader
-  .add("map_json", "map.json")
+  .add('tileset', 'tileset.png')
+  .add("map1_json", "map1.json")
+  .add("map2_json", "map2.json")
   .load(function ()
 {
 	
