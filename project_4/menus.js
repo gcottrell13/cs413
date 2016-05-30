@@ -24,7 +24,11 @@ templates.textbutton = function(text, params)
 	
 };
 
-
+function newContainer()
+{
+	this.g = new PIXI.Container();
+	basic_func(this);
+}
 function newButton(up, hover, down)
 {
 	this.gup = new_sprite(up);

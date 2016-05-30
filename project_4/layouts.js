@@ -12,13 +12,18 @@ function layouts()
 		
 		instructions : new newText(
 			"How to play:\n" +
-			"- Use the WASD keys to move around! \n" +
-			"The corridors will try their best\nto trick you...",
-			{font : '16px Arial', fill : 'white'})
+			"- Press or hold W to nudge the plane upward \n" +
+			"- Press A or D to flip the plane\n" +
+			"- Make it to the striped line at the end of the level to win!",
+			{font : '16px Arial', fill : 'white', wordWrap: true, wordWrapWidth: 600})
 			.pos(5, 5),
 		
-		level_complete : new newText("Level Complete!\nTry the next one!", {font: "20px Arial", fill: "white"})
-			.pos(125, 150),
+		game_ui_container : new newContainer(),
+		
+		level_complete : new newText("", {font: "20px Arial", fill: "white"})
+			.pos(50, 150),
+		level_next : new newText("", {font: "20px Arial", fill: "white"})
+			.pos(250, 150),
 		
 		startgame : new newButton('sgu', 'sgh', 'sgh')
 			.pos(100, 200)
@@ -48,6 +53,11 @@ function layouts()
 		
 		game : construct_graph(new PIXI.Container(0x0, true))
 			.down()
+			.create('game_ui_container')
+				.down()
+				.create('level_complete')
+				.create('level_next')
+				.up()
 		.end(),
 		
 		credits : construct_graph(new PIXI.Container(0, false))

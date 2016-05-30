@@ -24,6 +24,7 @@ PIXI.loader
   .add('tileset', 'tileset.png')
   .add("map1_json", "map1.json")
   .add("map2_json", "map2.json")
+  .add("map3_json", "map3.json")
   .load(function ()
 {
 	

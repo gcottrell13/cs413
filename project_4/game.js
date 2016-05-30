@@ -79,9 +79,13 @@ function game_tick()
 		{
 			if(current_level < num_levels)
 			{
+				setTimeout(function()
+					{
+						load_level(current_level + 1);
+						move_player_to_position_for_next_level();
+					}, 1000);
+				
 				game_state = 'pre_level';
-				load_level(current_level + 1);
-				move_player_to_position_for_next_level();
 			}
 		}
 		
@@ -114,7 +118,6 @@ function game_tick()
 		
 		if(hittest_block(player, levels[current_level].end_blocks) == true)
 		{
-			game_state = 'win';
 			finish_level();
 		}
 		setTimeout(game_tick, 1000 / FPS);
@@ -151,6 +154,8 @@ function get_block_gid_at(who)
 function start()
 {
 	states.game.addChild(viewport);
+	
+	elements.game_ui_container.g.visible = false;
 	
 	viewport.scale.x = game_scale;
 	viewport.scale.y = game_scale;
@@ -202,11 +207,25 @@ function finish_level()
 	// autopilot plane at horizontal moderate speed
 	// load next level
 	
+	game_state = 'win';
+	
 	createjs.Tween.get(viewport).to({y: -player.y*game_scale + (game_height /2)}
 			, 1500).call(function()
 			{
 				
 			});
+	
+	states.game.removeChild(elements.game_ui_container.g);
+	states.game.addChild(elements.game_ui_container.g);
+	
+	elements.game_ui_container.g.visible = true;
+	elements.game_ui_container.g.alpha = 0;
+	createjs.Tween.get(elements.game_ui_container.g).to({alpha: 1}, 1000);
+	
+	elements.level_complete.g.text = "Area " + current_level + " Complete!"
+	elements.level_complete.g.alpha = 1;
+	elements.level_next.g.alpha = 0;
+	
 }
 function move_player_to_position_for_next_level()
 {
@@ -221,10 +240,18 @@ function move_player_to_position_for_next_level()
 		{
 			start_level();
 		});
-	createjs.Tween.get(player).to({y: spawn.y}, 2000, createjs.Ease.cubicInOut).call(function()
-		{
-		});
+	createjs.Tween.get(player).to({y: spawn.y}, 2000, createjs.Ease.cubicInOut);
 	
+	elements.level_next.g.text = "Area " + current_level;
+	createjs.Tween.get(elements.level_complete.g).to({alpha: 0}, 2000);
+	createjs.Tween.get(elements.level_next.g).to({alpha: 1}, 2000).call(function()
+		{
+			createjs.Tween.get(elements.game_ui_container.g).to({alpha: 0}, 2000)
+				.call(function()
+					{
+						elements.game_ui_container.g.visible = false;
+					});
+		});
 	
 }
 
