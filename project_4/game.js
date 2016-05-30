@@ -27,11 +27,6 @@ var gravity = 1/FPS;
 
 var bg_playing = true;
 
-var current_level = 0;
-
-// if we currently have a game playing
-var level_playing = false;
-
 window.onkeydown = function(e)
 {
 	var key = keycode_to_str(e.keyCode);
@@ -66,62 +61,79 @@ function animate()
 
 // the game logic
 
-var win = false;
+var current_level = 0;
+var game_state = 'none';
 var MAX_SPEED = 5;
 
 function game_tick()
 {
-	if(player == null) return;
-	if(level_playing == false) return;
-	
-	if(win)
+	if(game_state == 'none') return;
+	if(game_state == 'win')
 	{
 		player.speed = MAX_SPEED / 2;
 		player.angle = pi2;
-	}
-	else
-		player.apply_gravity();
-	
-	player.move();
-	
-	get_camera_pos(player, viewport);
-	
-	if(player.y < 0 || 
-		player.x > world.worldWidth || 
-		player.x < 0 || 
-		player.y > world.worldHeight ||
-		hittest_block(player, levels[current_level].solid_blocks) == true)
-		{
-			// crash
-			level_playing = false;
-			
-			setTimeout(function(){restart_level();}, 1000);
-		}
-	
-	if(hittest_block(player, levels[current_level].end_blocks) == true)
-	{
-		// show 'you win' overlay
-		// autopilot plane at horizontal moderate speed
-		// load next level
-		win = true;
+		player.move();
 		
-		if(current_level < num_levels)
+		// test to see when we should load up the next map
+		if(player.x > world.worldWidth + game_width / 2)
 		{
-			load_level(current_level + 1);
-			start_level();
+			if(current_level < num_levels)
+			{
+				game_state = 'pre_level';
+				load_level(current_level + 1);
+				move_player_to_position_for_next_level();
+			}
 		}
+		
+		viewport.x = -player.x*game_scale + game_width /2;
+		
+		setTimeout(game_tick, 1000 / FPS);
 	}
-	
+	else if(game_state == 'pre_level')
+	{
+		
+	}
+	else if(game_state == 'play')
+	{
+		player.apply_gravity();
+		player.move();
+		
+		get_camera_pos(player, viewport);
+		
+		if(player.y < 0 || 
+			//player.x > world.worldWidth || 
+			//player.x < 0 || 
+			player.y > world.worldHeight ||
+			hittest_block(player, levels[current_level].solid_blocks) == true)
+			{
+				// crash
+				game_state = 'crash';
+				
+				setTimeout(function(){restart_level();}, 1000);
+			}
+		
+		if(hittest_block(player, levels[current_level].end_blocks) == true)
+		{
+			game_state = 'win';
+			finish_level();
+		}
+		setTimeout(game_tick, 1000 / FPS);
+	}
+	else if(game_state == 'crash')
+	{
+		
+	}
 	//elements.gamebg.g.x = player.x - game_width / game_scale;
 	//elements.gamebg.g.y = player.y - game_height / game_scale;
 	
-	setTimeout(game_tick, 1000 / FPS);
 }
 
 // game mechanics
 
 function hittest_block(who, blocks)
 {
+	if(who.x < 0) return false;
+	
 	var index = tu.getIndex(who.x, who.y, world.tilewidth, world.tileheight, world.widthInTiles);
 	var tile = tu.getTile(index, mapArray, world).gid;
 	
@@ -149,9 +161,9 @@ function start()
 
 function start_level()
 {
-	if(level_playing == false) 
+	if(game_state != 'play') 
 	{
-		level_playing = true;
+		game_state = 'play';
 		game_tick();
 	}
 }
@@ -184,13 +196,45 @@ function load_level(n)
 	current_level = n;
 }
 
+function finish_level()
+{
+	// show 'you win' overlay
+	// autopilot plane at horizontal moderate speed
+	// load next level
+	
+	createjs.Tween.get(viewport).to({y: -player.y*game_scale + (game_height /2)}
+			, 1500).call(function()
+			{
+				
+			});
+}
+function move_player_to_position_for_next_level()
+{
+	player.x = -game_width /4;
+	viewport.x = -player.x * game_scale + game_width /2;
+	var spawn = world.getObject('spawn');
+	
+	var camera = {};
+	get_camera_pos(spawn, camera);
+	
+	createjs.Tween.get(viewport).to({y: camera.y}, 2500).call(function()
+		{
+			start_level();
+		});
+	createjs.Tween.get(player).to({y: spawn.y}, 2000, createjs.Ease.cubicInOut).call(function()
+		{
+		});
+	
+	
+}
+
 function get_camera_pos(focus, camera) {
-  var x = -focus.x*game_scale + game_width/2;
-  var y = -focus.y*game_scale + game_height/2;
-  x = -Math.max(0, Math.min(world.worldWidth*game_scale - game_width, -x));
-  y = -Math.max(0, Math.min(world.worldHeight*game_scale - game_height, -y));
-  camera.x = x;
-  camera.y = y;
+	var x = -focus.x*game_scale + game_width/2;
+	var y = -focus.y*game_scale + game_height/2;
+	//x = -Math.max(0, Math.min(world.worldWidth*game_scale - game_width, -x));
+	y = -Math.max(0, Math.min(world.worldHeight*game_scale - game_height, -y));
+	camera.x = x;
+	camera.y = y;
 }
 
 
@@ -221,7 +265,7 @@ function construct_player()
 	g.anchor.x = 0.5;
 	g.anchor.y = 0.5;
 	
-	player.x = spawn.x;
+	player.x = spawn.x - game_width /4;
 	player.y = spawn.y;
 	
 	player.g.play();
@@ -283,15 +327,18 @@ function construct_player()
 	{
 		var handling_const = 0.08;
 		
-		if(flags.W)
+		if(game_state == 'play')
 		{
-			player.angle += -player.facing * handling_const;
-		}
-		
-		if((flags.A || flags.D) && flags.flipped == false)
-		{
-			flags.flipped = true;
-			player.flip();
+			if(flags.W)
+			{
+				player.angle += -player.facing * handling_const;
+			}
+			
+			if((flags.A || flags.D) && flags.flipped == false)
+			{
+				flags.flipped = true;
+				player.flip();
+			}
 		}
 		
 		if(player.angle < -pi) player.angle += 2*pi;
@@ -322,7 +369,7 @@ function construct_player()
 	player.flip = function()
 	{
 		player.facing = -player.facing;
-		player.g.scale.y = player.facing * playerscale;
+		createjs.Tween.get(player.g.scale).to({y: player.facing * playerscale}, 150);
 	};
 	
 	player.apply_boost = function()
