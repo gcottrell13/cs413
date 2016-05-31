@@ -65,6 +65,8 @@ var current_level = 0;
 var game_state = 'none';
 var MAX_SPEED = 5;
 
+var points = 0;
+
 function game_tick()
 {
 	if(game_state == 'none') return;
@@ -103,6 +105,12 @@ function game_tick()
 		player.move();
 		
 		get_camera_pos(player, viewport);
+		
+		elements.gamebg.g.x = -Math.max(0, 
+			Math.min((elements.gamebg.g.width - game_width), 
+				(elements.gamebg.g.width - game_width) * (player.x / world.worldWidth)));
+		
+		elements.points.g.text = points;
 		
 		if(player.y < 0 || 
 			//player.x > world.worldWidth || 
@@ -153,7 +161,7 @@ function get_block_gid_at(who)
 // the entry point to the game
 function start()
 {
-	states.game.addChild(viewport);
+	elements.game_viewport_container.g.addChild(viewport);
 	
 	elements.game_ui_container.g.visible = false;
 	
@@ -215,9 +223,6 @@ function finish_level()
 				
 			});
 	
-	states.game.removeChild(elements.game_ui_container.g);
-	states.game.addChild(elements.game_ui_container.g);
-	
 	elements.game_ui_container.g.visible = true;
 	elements.game_ui_container.g.alpha = 0;
 	createjs.Tween.get(elements.game_ui_container.g).to({alpha: 1}, 1000);
@@ -252,7 +257,7 @@ function move_player_to_position_for_next_level()
 						elements.game_ui_container.g.visible = false;
 					});
 		});
-	
+	createjs.Tween.get(elements.gamebg.g).to({x: 0}, 2000);
 }
 
 function get_camera_pos(focus, camera) {

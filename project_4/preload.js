@@ -27,7 +27,8 @@ PIXI.loader
   .add("map3_json", "map3.json")
   .load(function ()
 {
-	
+	load_texture_path('dat/background.png', 'background');
+	load_texture_path('dat/points_bg.png', 'points_bg');
 	load_texture_path('dat/airplane.png', 'airplane_spritesheet');
 	
 	layouts();
