@@ -66,6 +66,10 @@ var game_state = 'none';
 var MAX_SPEED = 5;
 
 var points = 0;
+var level_score = 0;
+var multiplier = 1;
+var powerup_chain = 0;
+var powerup_objects = [];
 
 function game_tick()
 {
@@ -110,8 +114,6 @@ function game_tick()
 			Math.min((elements.gamebg.g.width - game_width), 
 				(elements.gamebg.g.width - game_width) * (player.x / world.worldWidth)));
 		
-		elements.points.g.text = points;
-		
 		if(player.y < 0 || 
 			//player.x > world.worldWidth || 
 			//player.x < 0 || 
@@ -128,6 +130,20 @@ function game_tick()
 		{
 			finish_level();
 		}
+		
+		for(var i = 0; i < powerup_objects.length; i++)
+		{
+			var p = powerup_objects[i];
+			if(Math.pow(player.x - p.x, 2) + Math.pow(player.y - p.y, 2) <= p.radius*p.radius)
+			{
+				if(collect_powerup(p))
+				{
+					p.visible = false;
+					p.collected = true;
+				}
+			}
+		}
+		
 		setTimeout(game_tick, 1000 / FPS);
 	}
 	else if(game_state == 'crash')
@@ -138,6 +154,22 @@ function game_tick()
 	//elements.gamebg.g.y = player.y - game_height / game_scale;
 	
 }
+
+
+// the entry point to the game
+function start()
+{
+	elements.game_viewport_container.g.addChild(viewport);
+	
+	elements.game_ui_container.g.visible = false;
+	
+	viewport.scale.x = game_scale;
+	viewport.scale.y = game_scale;
+	
+	load_level(1);
+	start_level();
+}
+
 
 // game mechanics
 
@@ -158,19 +190,47 @@ function get_block_gid_at(who)
 	return tu.hitTestTile(who, mapArray, 0, world, 'some').gid;
 }
 
-// the entry point to the game
-function start()
+function collect_powerup(p)
 {
-	elements.game_viewport_container.g.addChild(viewport);
+	if(p.collected == true) return false;
 	
-	elements.game_ui_container.g.visible = false;
+	var type = p.powerup_type;
+	if(type == 'point')
+	{
+		add_point();
+	}
+	else
+	{
+		return false;
+	}
 	
-	viewport.scale.x = game_scale;
-	viewport.scale.y = game_scale;
-	
-	load_level(1);
-	start_level();
+	viewport.removeChild(p);
+	return true;
 }
+function add_point()
+{
+	level_score += multiplier;
+	
+	powerup_chain ++;
+	if(powerup_chain >= 5)
+	{
+		multiplier ++;
+		powerup_chain = 0;
+	}
+	
+	display_points();
+}
+
+function display_points()
+{
+	elements.points.g.text = level_score + points;
+
+	var dashes = '';
+	for(var j = 0; j < powerup_chain; j++)
+		dashes += '[] ';
+	elements.points_extra.g.text = "Multiply: " + multiplier + '\n' + dashes;
+}
+
 
 function start_level()
 {
@@ -183,6 +243,13 @@ function start_level()
 function restart_level()
 {
 	load_level(current_level);
+	
+	multiplier = 1;
+	powerup_chain = 0;
+	level_score = 0;
+	
+	display_points();
+	
 	start_level();
 }
 
@@ -193,6 +260,11 @@ function load_level(n)
 	{
 		viewport.removeChild(world);
 		viewport.removeChild(player);
+		
+		for(var i = 0; i < powerup_objects.length; i++)
+			viewport.removeChild(powerup_objects[i]);
+		powerup_objects = [];
+		
 		win = false;
 	}
 	
@@ -201,7 +273,10 @@ function load_level(n)
 	
 	mapArray = world.getObject('map').data;
 	
+	display_points();
+	
 	construct_player();
+	construct_powerups();
 	
 	player.speed = 2;
 	player.angle = pi2;
@@ -216,6 +291,11 @@ function finish_level()
 	// load next level
 	
 	game_state = 'win';
+	
+	points += level_score;
+	level_score = 0;
+	
+	display_points();
 	
 	createjs.Tween.get(viewport).to({y: -player.y*game_scale + (game_height /2)}
 			, 1500).call(function()
@@ -269,7 +349,44 @@ function get_camera_pos(focus, camera) {
 	camera.y = y;
 }
 
-
+function construct_powerups()
+{
+	var p = world.getObjects('point');
+	
+	var tx = new PIXI.BaseTexture.fromImage('dat/point.png');
+	var frames = [
+		new PIXI.Texture(tx, new PIXI.Rectangle(2, 2, 16, 16)),
+		new PIXI.Texture(tx, new PIXI.Rectangle(20, 2, 16, 16)),
+		new PIXI.Texture(tx, new PIXI.Rectangle(38, 2, 16, 16))
+	];
+	
+	for(var i = 0; i < p.length; i++)
+	{
+		var point = new PIXI.Container();
+		var g = new PIXI.extras.MovieClip(frames);
+		
+		point.g = g;
+		
+		viewport.addChild(point);
+		point.addChild(g);
+		
+		point.g.anchor.x = 0.5;
+		point.g.anchor.y = 0.5;
+		
+		point.x = p[i].x + 8;
+		point.y = p[i].y - 8;
+		
+		g.animationSpeed = 0.3;
+		g.play();
+		
+		powerup_objects.push(point);
+		
+		point.radius = 16;
+		point.powerup_type = 'point';
+		point.collected = false;
+	}
+	
+}
 
 function construct_player()
 {
@@ -370,6 +487,10 @@ function construct_player()
 			{
 				flags.flipped = true;
 				player.flip();
+			}
+			if(flags.S)
+			{
+				player.speed *= 1 - 1/FPS;
 			}
 		}
 		

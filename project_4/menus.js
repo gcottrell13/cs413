@@ -24,6 +24,16 @@ templates.textbutton = function(text, params)
 	
 };
 
+templates.post_process_queue = [];
+templates.post_process = function()
+{
+	for(var i = 0; i < templates.post_process_queue.length; i++)
+	{
+		var e = templates.post_process_queue[i];
+		e[1].apply(e[0]);
+	}
+};
+
 function newContainer()
 {
 	this.g = new PIXI.Container();
@@ -31,17 +41,26 @@ function newContainer()
 }
 function newButton(up, hover, down)
 {
-	this.gup = new_sprite(up);
-	this.gdown = new_sprite(down);
-	this.ghover = new_sprite(hover);
+	if(up != undefined)
+	{
+		this.gup = new_sprite(up);
+		this.g.addChild(this.gup);
+	}
+	if(hover != undefined)
+	{
+		this.ghover = new_sprite(hover);
+		this.g.addChild(this.ghover);
+	}
+	if(down != undefined)
+	{
+		this.gdown = new_sprite(down);
+		this.g.addChild(this.gdown);
+	}
 	
 	this.g = new PIXI.Sprite();
 	this.g.interactive = true;
 	this.g.buttonMode = true;
 	
-	this.g.addChild(this.gup);
-	this.g.addChild(this.gdown);
-	this.g.addChild(this.ghover);
 	
 	var me = this;
 	this.click = function(cb)
@@ -56,7 +75,49 @@ function newButton(up, hover, down)
 		return this;
 	};
 	
+	this.up_text = function(t, p)
+	{
+		if(p == undefined) // t is an element name
+			this.set_state_text('up', t);
+		else
+		{
+			if(this.gup != undefined) this.g.removeChild(this.gup);
+			this.gup = new newText(t, p).g;
+			this.g.addChild(this.gup);
+		}
+		return this;
+	};
+	this.hover_text = function(t, p)
+	{
+		if(p == undefined) // t is an element name
+			this.set_state_text('hover', t);
+		else
+		{
+			if(this.ghover != undefined) this.g.removeChild(this.ghover);
+			this.ghover = new newText(t, p).g;
+			this.g.addChild(this.ghover);
+		}
+		return this;
+	};
+	this.down_text = function(t, p)
+	{
+		if(p == undefined) // t is an element name
+			this.set_state_text('down', t);
+		else
+		{
+			if(this.gdown != undefined) this.g.removeChild(this.gdown);
+			this.gdown = new newText(t, p).g;
+			this.g.addChild(this.gdown);
+		}
+		return this;
+	};
+	this.set_state_text = function(s, em)
+	{
+		return this;
+	};
+	
 	button_func(this);
+	
 	basic_func(this);
 }
 
@@ -69,6 +130,8 @@ function newSprite(tx_name)
 function newText(txt, params)
 {
 	this.g = new PIXI.Text(txt, params);
+	this.p = params;
+	this.t = txt;
 	basic_func(this);
 }
 
@@ -136,7 +199,13 @@ function button_func(me)
 		state = 'hover';
 	};
 	
-	me.g.mouseout(null);
+	me.done = function()
+	{
+		templates.post_process_queue.push([me, function()
+		{
+			this.g.mouseout(null);
+		}]);
+	};
 }
 
 

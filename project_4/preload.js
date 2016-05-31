@@ -29,6 +29,7 @@ PIXI.loader
 {
 	load_texture_path('dat/background.png', 'background');
 	load_texture_path('dat/points_bg.png', 'points_bg');
+	load_texture_path('dat/point.png', 'point');
 	load_texture_path('dat/airplane.png', 'airplane_spritesheet');
 	
 	layouts();
@@ -40,8 +41,7 @@ PIXI.loader
 	bg_music.play();
 	*/
 	
-	state_stack.push('game');
-	start();
+	state_stack.push('main');
 	animate();
 });
 
