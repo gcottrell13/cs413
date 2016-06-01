@@ -69,6 +69,7 @@ var points = 0;
 var level_score = 0;
 var multiplier = 1;
 var powerup_chain = 0;
+var max_powerup_chain = 5;
 var powerup_objects = [];
 
 function game_tick()
@@ -123,7 +124,13 @@ function game_tick()
 				// crash
 				game_state = 'crash';
 				
-				setTimeout(function(){restart_level();}, 1000);
+				elements.points_bg.g.tint = 0xcc4444;
+				level_score = 0;
+				multiplier = Math.max(1, multiplier - 3);
+				powerup_chain = 0;
+				display_points();
+				
+				setTimeout(function(){elements.points_bg.g.tint = 0xffffff; restart_level();}, 1000);
 			}
 		
 		if(hittest_block(player, levels[current_level].end_blocks) == true)
@@ -162,6 +169,21 @@ function start()
 	elements.game_viewport_container.g.addChild(viewport);
 	
 	elements.game_ui_container.g.visible = false;
+	
+	// setting up the multiplier visualization
+	var tx = new PIXI.BaseTexture.fromImage('dat/point.png');
+	var frame = new PIXI.Texture(tx, new PIXI.Rectangle(2, 2, 16, 16));
+	for(var i = 0; i < max_powerup_chain; i++)
+	{
+		var s = new PIXI.Sprite(frame);
+		s.x = 10 + 25 * i;
+		s.y = 70;
+		s.scale.x = 2;
+		s.scale.y = 2;
+		elements.game_points_container.g.addChild(s);
+		elements.game_points_container.g['marker' + i] = s;
+		s.visible = false;
+	}
 	
 	viewport.scale.x = game_scale;
 	viewport.scale.y = game_scale;
@@ -225,10 +247,13 @@ function display_points()
 {
 	elements.points.g.text = level_score + points;
 
-	var dashes = '';
-	for(var j = 0; j < powerup_chain; j++)
-		dashes += '[] ';
-	elements.points_extra.g.text = "Multiply: " + multiplier + '\n' + dashes;
+	elements.points_extra.g.text = "Multiply: " + multiplier;
+	
+	for(var i = 0; i < max_powerup_chain; i++)
+	{
+		var s = elements.game_points_container.g['marker' + i];
+		s.visible = (i < powerup_chain);
+	}
 }
 
 
@@ -243,12 +268,6 @@ function start_level()
 function restart_level()
 {
 	load_level(current_level);
-	
-	multiplier = 1;
-	powerup_chain = 0;
-	level_score = 0;
-	
-	display_points();
 	
 	start_level();
 }
