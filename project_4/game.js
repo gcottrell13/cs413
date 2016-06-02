@@ -20,6 +20,9 @@ var player = null;
 var viewport = new PIXI.Container();
 var mapArray;
 
+var now;
+var elapsed = Date.now();
+
 // some useful variables
 var FPS = 45;
 
@@ -53,6 +56,13 @@ window.onkeyup = function(e)
 
 function animate()
 {
+	
+	now = Date.now();
+	
+	if(emitter != null)
+		emitter.update((now - elapsed) * 0.001);
+	elapsed = now;
+	
 	requestAnimationFrame(animate);
 	var stage = states[state_stack.get_top()];
 	renderer.render(stage);
@@ -64,6 +74,7 @@ function animate()
 var current_level = 0;
 var game_state = 'none';
 var MAX_SPEED = 5;
+var START_SPEED = 2;
 
 var points = 0;
 var level_score = 0;
@@ -82,9 +93,9 @@ function game_tick()
 		player.move();
 		
 		// test to see when we should load up the next map
-		if(player.x > world.worldWidth + game_width / 2)
+		if(current_level < num_levels)
 		{
-			if(current_level < num_levels)
+			if(player.x > world.worldWidth + game_width / 2)
 			{
 				setTimeout(function()
 					{
@@ -124,13 +135,7 @@ function game_tick()
 				// crash
 				game_state = 'crash';
 				
-				elements.points_bg.g.tint = 0xcc4444;
-				level_score = 0;
-				multiplier = Math.max(1, multiplier - 3);
-				powerup_chain = 0;
-				display_points();
-				
-				setTimeout(function(){elements.points_bg.g.tint = 0xffffff; restart_level();}, 1000);
+				crash();
 			}
 		
 		if(hittest_block(player, levels[current_level].end_blocks) == true)
@@ -155,7 +160,6 @@ function game_tick()
 	}
 	else if(game_state == 'crash')
 	{
-		
 	}
 	//elements.gamebg.g.x = player.x - game_width / game_scale;
 	//elements.gamebg.g.y = player.y - game_height / game_scale;
@@ -226,7 +230,6 @@ function collect_powerup(p)
 		return false;
 	}
 	
-	viewport.removeChild(p);
 	return true;
 }
 function add_point()
@@ -257,6 +260,20 @@ function display_points()
 }
 
 
+function crash()
+{
+	spray_explosion();
+	player.visible = false;
+	
+	elements.points_bg.g.tint = 0xcc4444;
+	level_score = 0;
+	multiplier = Math.max(1, multiplier - 3);
+	powerup_chain = 0;
+	display_points();
+	
+	setTimeout(function(){elements.points_bg.g.tint = 0xffffff; restart_level();}, 2000);
+}
+
 function start_level()
 {
 	if(game_state != 'play') 
@@ -267,7 +284,27 @@ function start_level()
 }
 function restart_level()
 {
-	load_level(current_level);
+	//load_level(current_level);
+	
+	for(var i = 0; i < powerup_objects.length; i++)
+	{
+		var p = powerup_objects[i];
+		
+		if(p.powerup_type == 'point')
+		{
+			p.collected = false;
+			p.visible = true;
+		}
+	}
+	
+	var spawn = world.getObject('spawn');
+	player.x = -game_width /4;
+	player.y = spawn.y;
+	player.angle = pi2;
+	player.speed = START_SPEED;
+	player.visible = true;
+	
+	if(player.facing == -1) player.flip();
 	
 	start_level();
 }
@@ -297,7 +334,7 @@ function load_level(n)
 	construct_player();
 	construct_powerups();
 	
-	player.speed = 2;
+	player.speed = START_SPEED;
 	player.angle = pi2;
 	
 	current_level = n;
@@ -329,6 +366,24 @@ function finish_level()
 	elements.level_complete.g.text = "Area " + current_level + " Complete!"
 	elements.level_complete.g.alpha = 1;
 	elements.level_next.g.alpha = 0;
+	
+	if(current_level >= num_levels)
+	{
+		elements.level_complete.g.text += '\nAll Areas Complete!\nWell Done!';
+		elements.level_next.g.alpha = 1;
+		
+		// show previous high score
+		var hs = parseInt(getCookie('airraid_highscore'));
+		if(points > hs)
+		{
+			elements.level_next.g.text = "New High Score!\n" + points;
+			setCookie('airraid_highscore', points, 100);
+		}
+		else
+		{
+			elements.level_next.g.text = "Your current score: " + points + "\nYour High Score: " + hs;
+		}
+	}
 	
 }
 function move_player_to_position_for_next_level()
@@ -502,12 +557,12 @@ function construct_player()
 				player.angle += -player.facing * handling_const;
 			}
 			
-			if((flags.A || flags.D) && flags.flipped == false)
+			if(flags.D && flags.flipped == false)
 			{
 				flags.flipped = true;
 				player.flip();
 			}
-			if(flags.S)
+			if(flags.A)
 			{
 				player.speed *= 1 - 1/FPS;
 			}
@@ -556,6 +611,37 @@ function construct_player()
 }
 
 
+var emitter = null;
+
+function spray_explosion()
+{
+	
+	if(emitter != null)
+	{
+		emitter.destroy();
+	}
+	
+	var x = player.x;
+	var y = player.y;
+	var speed = player.speed;
+	var angle = player.g.rotation * 180 / pi;
+	
+	var speed_mult = 12;
+	var speed_variance = 2;
+	var angle_variance = 35;
+	
+	explosion_emitter.speed.start = Math.max(1, (speed - speed_variance) * speed_mult, 0);
+	explosion_emitter.speed.end = explosion_emitter.speed.start + speed_variance * 2 * speed_mult;
+	explosion_emitter.startRotation.min = angle - angle_variance;
+	explosion_emitter.startRotation.max = angle + angle_variance;
+	
+	emitter = new PIXI.particles.Emitter(viewport, 
+		[PIXI.Texture.fromImage('dat/Pixel25px.png')],
+		explosion_emitter);
+	
+	emitter.updateSpawnPos(x, y);
+	emitter.emit = true;
+}
 
 
 

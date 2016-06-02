@@ -21,12 +21,20 @@ function layouts()
 			.pos(10, 50),
 		
 		instructions : new newText(
-			"How to play:\n" +
-			"- Press or hold W to nudge the plane upward \n" +
-			"- Press A or D to flip the plane\n" +
+			"How to play:\n\n" +
+			"Controls:\n" +
+			"- Press or hold W to nudge the plane upward (relative to the plane)\n" +
+			"   Gravity will increase or decrease your speed automatically, depending on whether " +
+			"you are flying up or down\n" +
+			"- Press D to flip the plane\n" +
+			"   This can be used for acrobatic maneuvers and cool tricks!\n" +
+			"- Press A to slow the plane down\n" +
+			"   But be careful, losing too much speed can cause you to stall\n\n" +
+			"Goals: \n" +
+			"- Collect the points and powerups\n" + 
 			"- Make it to the striped line at the end of the level to win!",
-			{font : '16px Verdana', fill : 'white', wordWrap: true, wordWrapWidth: 600})
-			.pos(5, 5),
+			{font : '16px Verdana', fill : 'white', wordWrap: true, wordWrapWidth: 400})
+			.pos(350, 5),
 		
 		game_ui_container : new newContainer(),
 		game_points_container: new newContainer(),
@@ -35,7 +43,7 @@ function layouts()
 		level_complete : new newText("", {font: "20px Verdana", fill: "white"})
 			.pos(50, 150),
 		level_next : new newText("", {font: "20px Verdana", fill: "white"})
-			.pos(250, 150),
+			.pos(275, 150),
 		
 		startgame : new newButton()
 			.pos(100, 200)
@@ -59,7 +67,7 @@ function layouts()
 					start();
 				}),
 		inst_start_button : new newButton()
-			.pos(100, 200)
+			.pos(100, 300)
 			.up_text(sgtext, sgparams)
 			.down_text(sgtext, sgparams)
 			.hover_text(sgtext, sgparams)
@@ -101,6 +109,7 @@ function layouts()
 		
 		instructions : construct_graph(new PIXI.Container(0, true))
 			.down()
+			.create('instructions')
 			.create('inst_start_button')
 		.end(),
 		

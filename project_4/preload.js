@@ -43,5 +43,58 @@ PIXI.loader
 	
 	state_stack.push('main');
 	animate();
+	
+	if(getCookie('airraid_highscore') == '')
+	{
+		setCookie('airraid_highscore', 0, 100);
+	}
+	
 });
+
+var explosion_emitter = {
+	"alpha": {
+		"start": 1,
+		"end": 0
+	},
+	"scale": {
+		"start": 0.3,
+		"end": 0.001,
+		"minimumScaleMultiplier": 1
+	},
+	"color": {
+		"start": "#ffffff",
+		"end": "#ff3d71"
+	},
+	"speed": {
+		"start": 50,
+		"end": 100
+	},
+	"acceleration": {
+		"x": 0,
+		"y": 5
+	},
+	"startRotation": {
+		"min": 0,
+		"max": 0
+	},
+	"rotationSpeed": {
+		"min": 0,
+		"max": 1
+	},
+	"lifetime": {
+		"min": 30,
+		"max": 40
+	},
+	"blendMode": "normal",
+	"frequency": 0.002,
+	"emitterLifetime": 0.1,
+	"maxParticles": 500,
+	"pos": {
+		"x": 0,
+		"y": 0
+	},
+	"addAtBack": false,
+	"spawnType": "point"
+};
+
 
