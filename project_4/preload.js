@@ -25,14 +25,25 @@ PIXI.loader
   .add("map1_json", "map1.json")
   .add("map2_json", "map2.json")
   .add("map3_json", "map3.json")
+  .add("map4_json", "map4.json")
+  .add("map5_json", "map5.json")
+  .add("map6_json", "map6.json")
+  .add("map7_json", "map7.json")
+  .add("map8_json", "map8.json")
+  .add('explosion.mp3')
+  .add('powerup.mp3')
   .load(function ()
 {
 	load_texture_path('dat/background.png', 'background');
+	load_texture_path('dat/background2.png', 'background2');
+	load_texture_path('dat/background3.png', 'background3');
 	load_texture_path('dat/points_bg.png', 'points_bg');
 	load_texture_path('dat/point.png', 'point');
 	load_texture_path('dat/airplane.png', 'airplane_spritesheet');
 	
 	layouts();
+	
+	setup();
 	
 	/*
 	bg_music = PIXI.audioManager.getAudio("froggening.mp3");

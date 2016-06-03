@@ -43,6 +43,11 @@ window.onkeydown = function(e)
 		bg_playing = !bg_playing;
 	}
 	
+	if(key == 'ESCAPE' && state_stack.get_top() == 'game')
+	{
+		state_stack.push('pause');
+	}
+	
 	if(player != undefined)
 		player.handle_button_down(key);
 };
@@ -52,6 +57,34 @@ window.onkeyup = function(e)
 	
 	if(player != undefined)
 		player.handle_button_up(key);
+}
+
+function setup()
+{
+	
+	elements.game_viewport_container.g.addChild(viewport);
+	
+	elements.game_ui_container.g.visible = false;
+	elements.try_again.g.visible = false;
+	
+	// setting up the multiplier visualization
+	var tx = new PIXI.BaseTexture.fromImage('dat/point.png');
+	var frame = new PIXI.Texture(tx, new PIXI.Rectangle(2, 2, 16, 16));
+	for(var i = 0; i < max_powerup_chain; i++)
+	{
+		var s = new PIXI.Sprite(frame);
+		s.x = 10 + 25 * i;
+		s.y = 70;
+		s.scale.x = 2;
+		s.scale.y = 2;
+		elements.game_points_container.g.addChild(s);
+		elements.game_points_container.g['marker' + i] = s;
+		s.visible = false;
+	}
+	
+	viewport.scale.x = game_scale;
+	viewport.scale.y = game_scale;
+	
 }
 
 function animate()
@@ -85,6 +118,8 @@ var powerup_objects = [];
 
 function game_tick()
 {
+	if(state_stack.get_top() != 'game') return;
+	
 	if(game_state == 'none') return;
 	if(game_state == 'win')
 	{
@@ -170,27 +205,12 @@ function game_tick()
 // the entry point to the game
 function start()
 {
-	elements.game_viewport_container.g.addChild(viewport);
+	points = 0;
+	powerup_chain = 0;
+	level_score = 0;
+	multiplier = 1;
 	
 	elements.game_ui_container.g.visible = false;
-	
-	// setting up the multiplier visualization
-	var tx = new PIXI.BaseTexture.fromImage('dat/point.png');
-	var frame = new PIXI.Texture(tx, new PIXI.Rectangle(2, 2, 16, 16));
-	for(var i = 0; i < max_powerup_chain; i++)
-	{
-		var s = new PIXI.Sprite(frame);
-		s.x = 10 + 25 * i;
-		s.y = 70;
-		s.scale.x = 2;
-		s.scale.y = 2;
-		elements.game_points_container.g.addChild(s);
-		elements.game_points_container.g['marker' + i] = s;
-		s.visible = false;
-	}
-	
-	viewport.scale.x = game_scale;
-	viewport.scale.y = game_scale;
 	
 	load_level(1);
 	start_level();
@@ -224,6 +244,8 @@ function collect_powerup(p)
 	if(type == 'point')
 	{
 		add_point();
+		player.speed += 0.1;
+		PIXI.audioManager.getAudio("powerup.mp3").play();
 	}
 	else
 	{
@@ -236,6 +258,8 @@ function add_point()
 {
 	level_score += multiplier;
 	
+	create_popup_text("+" + multiplier, {font: "12px Verdana", fill: "white"}, player.x, player.y, 2000);
+	
 	powerup_chain ++;
 	if(powerup_chain >= 5)
 	{
@@ -244,6 +268,7 @@ function add_point()
 	}
 	
 	display_points();
+	
 }
 
 function display_points()
@@ -263,11 +288,15 @@ function display_points()
 function crash()
 {
 	spray_explosion();
+	var crashsound = PIXI.audioManager.getAudio("explosion.mp3");
+	crashsound.volume = 0.4;
+	crashsound.play();
+	
 	player.visible = false;
 	
 	elements.points_bg.g.tint = 0xcc4444;
 	level_score = 0;
-	multiplier = Math.max(1, multiplier - 3);
+	multiplier = Math.max(1, multiplier - 2);
 	powerup_chain = 0;
 	display_points();
 	
@@ -324,6 +353,23 @@ function load_level(n)
 		win = false;
 	}
 	
+	if(n < 4)
+	{
+		elements.gamebg.new_sprite('background');
+		elements.pausebg.new_sprite('background');
+	}
+	else if(n < 7)
+	{
+		elements.gamebg.new_sprite('background2');
+		elements.pausebg.new_sprite('background2');
+	}
+	else
+	{
+		elements.gamebg.new_sprite('background3');
+		elements.pausebg.new_sprite('background3');
+	}
+	
+	
 	world = tu.makeTiledWorld(levels[n].map, levels[n].tileset);
 	viewport.addChild(world);
 	
@@ -372,6 +418,8 @@ function finish_level()
 		elements.level_complete.g.text += '\nAll Areas Complete!\nWell Done!';
 		elements.level_next.g.alpha = 1;
 		
+		elements.try_again.g.visible = true;
+		
 		// show previous high score
 		var hs = parseInt(getCookie('airraid_highscore'));
 		if(points > hs)
@@ -381,7 +429,7 @@ function finish_level()
 		}
 		else
 		{
-			elements.level_next.g.text = "Your current score: " + points + "\nYour High Score: " + hs;
+			elements.level_next.g.text = "Your Current Score: " + points + "\nYour High Score: " + hs;
 		}
 	}
 	
@@ -643,6 +691,17 @@ function spray_explosion()
 	emitter.emit = true;
 }
 
+function create_popup_text(txt, params, x, y, time)
+{
 
+	var text_popup = new PIXI.Text(txt, params);
+	text_popup.x = x;
+	text_popup.y = y;
+	createjs.Tween.get(text_popup).to({y: y - 0.02 * time, alpha: 0}, time).call(function()
+		{
+			viewport.removeChild(text_popup);
+		});
+	viewport.addChild(text_popup);
+}
 
 

@@ -17,7 +17,7 @@
          "name":"objects",
          "objects":[
                 {
-                 "gid":13,
+                 "gid":37,
                  "height":40,
                  "id":4,
                  "name":"spawn",
@@ -29,7 +29,7 @@
                  "y":77.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":33,
                  "name":"point",
@@ -41,7 +41,7 @@
                  "y":123
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":34,
                  "name":"point",
@@ -53,7 +53,7 @@
                  "y":198
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":35,
                  "name":"point",
@@ -65,7 +65,7 @@
                  "y":296
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":36,
                  "name":"point",
@@ -77,7 +77,7 @@
                  "y":445.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":37,
                  "name":"point",
@@ -89,7 +89,7 @@
                  "y":388
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":38,
                  "name":"point",
@@ -101,7 +101,7 @@
                  "y":131.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":39,
                  "name":"point",
@@ -113,7 +113,7 @@
                  "y":111
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":40,
                  "name":"point",
@@ -125,7 +125,7 @@
                  "y":296.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":41,
                  "name":"point",
@@ -137,7 +137,7 @@
                  "y":168
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":42,
                  "name":"point",
@@ -149,7 +149,7 @@
                  "y":323.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":43,
                  "name":"point",
@@ -161,7 +161,7 @@
                  "y":240.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":44,
                  "name":"point",
@@ -173,7 +173,7 @@
                  "y":296
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":45,
                  "name":"point",
@@ -185,7 +185,7 @@
                  "y":233
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":46,
                  "name":"point",
@@ -197,7 +197,7 @@
                  "y":84
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":47,
                  "name":"point",
@@ -209,7 +209,7 @@
                  "y":274
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":48,
                  "name":"point",
@@ -221,7 +221,7 @@
                  "y":480.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":49,
                  "name":"point",
@@ -233,7 +233,7 @@
                  "y":431
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":50,
                  "name":"point",
@@ -245,7 +245,7 @@
                  "y":230.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":51,
                  "name":"point",
@@ -257,7 +257,7 @@
                  "y":145.5
                 }, 
                 {
-                 "gid":16,
+                 "gid":40,
                  "height":16,
                  "id":52,
                  "name":"point",
@@ -275,7 +275,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":53,
+ "nextobjectid":54,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":16,
@@ -284,19 +284,19 @@
          "columns":6,
          "firstgid":1,
          "image":"tileset.png",
-         "imageheight":38,
+         "imageheight":110,
          "imagewidth":110,
          "margin":2,
-         "name":"tileset1",
+         "name":"tileset",
          "spacing":2,
-         "tilecount":12,
+         "tilecount":36,
          "tileheight":16,
          "tilewidth":16
         }, 
         {
          "columns":3,
-         "firstgid":13,
-         "image":"airplane.png",
+         "firstgid":37,
+         "image":"dat\/airplane.png",
          "imageheight":40,
          "imagewidth":120,
          "margin":0,
@@ -308,7 +308,7 @@
         }, 
         {
          "columns":3,
-         "firstgid":16,
+         "firstgid":40,
          "image":"dat\/point.png",
          "imageheight":20,
          "imagewidth":56,

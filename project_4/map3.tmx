@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="100" height="32" tilewidth="16" tileheight="16" nextobjectid="53">
- <tileset firstgid="1" name="tileset1" tilewidth="16" tileheight="16" spacing="2" margin="2" tilecount="12" columns="6">
-  <image source="tileset.png" width="110" height="38"/>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="100" height="32" tilewidth="16" tileheight="16" nextobjectid="54">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" spacing="2" margin="2" tilecount="36" columns="6">
+  <image source="tileset.png" width="110" height="110"/>
  </tileset>
- <tileset firstgid="13" name="airplane" tilewidth="40" tileheight="40" tilecount="3" columns="3">
-  <image source="airplane.png" width="120" height="40"/>
+ <tileset firstgid="37" name="airplane" tilewidth="40" tileheight="40" tilecount="3" columns="3">
+  <image source="dat/airplane.png" width="120" height="40"/>
  </tileset>
- <tileset firstgid="16" name="point" tilewidth="16" tileheight="16" spacing="2" margin="2" tilecount="3" columns="3">
+ <tileset firstgid="40" name="point" tilewidth="16" tileheight="16" spacing="2" margin="2" tilecount="3" columns="3">
   <image source="dat/point.png" width="56" height="20"/>
  </tileset>
  <layer name="map" width="100" height="32">
@@ -46,26 +46,26 @@
 </data>
  </layer>
  <objectgroup name="objects">
-  <object id="4" name="spawn" gid="13" x="2" y="77.5" width="40" height="40"/>
-  <object id="33" name="point" gid="16" x="104" y="123" width="16" height="16"/>
-  <object id="34" name="point" gid="16" x="264.5" y="198" width="16" height="16"/>
-  <object id="35" name="point" gid="16" x="103.5" y="296" width="16" height="16"/>
-  <object id="36" name="point" gid="16" x="263.5" y="445.5" width="16" height="16"/>
-  <object id="37" name="point" gid="16" x="530.5" y="388" width="16" height="16"/>
-  <object id="38" name="point" gid="16" x="524.5" y="131.5" width="16" height="16"/>
-  <object id="39" name="point" gid="16" x="570" y="111" width="16" height="16"/>
-  <object id="40" name="point" gid="16" x="725" y="296.5" width="16" height="16"/>
-  <object id="41" name="point" gid="16" x="729.5" y="168" width="16" height="16"/>
-  <object id="42" name="point" gid="16" x="691.5" y="323.5" width="16" height="16"/>
-  <object id="43" name="point" gid="16" x="554.5" y="240.5" width="16" height="16"/>
-  <object id="44" name="point" gid="16" x="948.5" y="296" width="16" height="16"/>
-  <object id="45" name="point" gid="16" x="948" y="233" width="16" height="16"/>
-  <object id="46" name="point" gid="16" x="1173" y="84" width="16" height="16"/>
-  <object id="47" name="point" gid="16" x="1184" y="274" width="16" height="16"/>
-  <object id="48" name="point" gid="16" x="1056.5" y="480.5" width="16" height="16"/>
-  <object id="49" name="point" gid="16" x="1222" y="431" width="16" height="16"/>
-  <object id="50" name="point" gid="16" x="1408.5" y="230.5" width="16" height="16"/>
-  <object id="51" name="point" gid="16" x="1491.5" y="145.5" width="16" height="16"/>
-  <object id="52" name="point" gid="16" x="1407.5" y="70" width="16" height="16"/>
+  <object id="4" name="spawn" gid="37" x="2" y="77.5" width="40" height="40"/>
+  <object id="33" name="point" gid="40" x="104" y="123" width="16" height="16"/>
+  <object id="34" name="point" gid="40" x="264.5" y="198" width="16" height="16"/>
+  <object id="35" name="point" gid="40" x="103.5" y="296" width="16" height="16"/>
+  <object id="36" name="point" gid="40" x="263.5" y="445.5" width="16" height="16"/>
+  <object id="37" name="point" gid="40" x="530.5" y="388" width="16" height="16"/>
+  <object id="38" name="point" gid="40" x="524.5" y="131.5" width="16" height="16"/>
+  <object id="39" name="point" gid="40" x="570" y="111" width="16" height="16"/>
+  <object id="40" name="point" gid="40" x="725" y="296.5" width="16" height="16"/>
+  <object id="41" name="point" gid="40" x="729.5" y="168" width="16" height="16"/>
+  <object id="42" name="point" gid="40" x="691.5" y="323.5" width="16" height="16"/>
+  <object id="43" name="point" gid="40" x="554.5" y="240.5" width="16" height="16"/>
+  <object id="44" name="point" gid="40" x="948.5" y="296" width="16" height="16"/>
+  <object id="45" name="point" gid="40" x="948" y="233" width="16" height="16"/>
+  <object id="46" name="point" gid="40" x="1173" y="84" width="16" height="16"/>
+  <object id="47" name="point" gid="40" x="1184" y="274" width="16" height="16"/>
+  <object id="48" name="point" gid="40" x="1056.5" y="480.5" width="16" height="16"/>
+  <object id="49" name="point" gid="40" x="1222" y="431" width="16" height="16"/>
+  <object id="50" name="point" gid="40" x="1408.5" y="230.5" width="16" height="16"/>
+  <object id="51" name="point" gid="40" x="1491.5" y="145.5" width="16" height="16"/>
+  <object id="52" name="point" gid="40" x="1407.5" y="70" width="16" height="16"/>
  </objectgroup>
 </map>

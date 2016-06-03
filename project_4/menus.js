@@ -125,6 +125,22 @@ function newSprite(tx_name)
 {
 	this.g = new_sprite(tx_name);
 	basic_func(this);
+	
+	this.new_sprite = function(tx_name)
+	{
+		var p = this.g.parent;
+		p.removeChild(this.g);
+		var g = new_sprite(tx_name);
+		p.addChild(g);
+		g.x = this.g.x;
+		g.y = this.g.y;
+		g.scale.x = this.g.scale.x;
+		g.scale.y = this.g.scale.y;
+		g.anchor.x = this.g.anchor.x;
+		g.anchor.y = this.g.anchor.y;
+		
+		this.g = g;
+	};
 }
 
 function newText(txt, params)
